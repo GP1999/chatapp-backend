@@ -112,10 +112,7 @@ async function validateOTP(req, res, next) {
         console.log(err);
         res.status(500).send({err: "Internal Server Error"});
     }
-
 }
-
-
 module.exports = {
     validateNewUser,
     validateOTP
