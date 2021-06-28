@@ -72,8 +72,6 @@ function generateOTP() {
 
 function sendOTP(userid, email) {
     try {
-
-
         let mail = {
             userid: userid,
             email: email
@@ -92,5 +90,6 @@ function sendOTP(userid, email) {
 
 
 module.exports = {
-    sendOTP
+    sendOTP,
+    generateOTP
 }

@@ -30,7 +30,7 @@ class User {
         }
     }
     getObject() {
-        return {userid: this.userid, email: this.email, name: this.name, password: this.password}
+        return {email: this.email, name: this.name, password: this.password}
     }
 
     //Save the NewUser Information in MongoDb Database
@@ -39,7 +39,6 @@ class User {
     saveInMongo() {
         return  ChatApp.collection('Users').insertOne(this.getObject());
     }
-   
 }
 
 module.exports = User

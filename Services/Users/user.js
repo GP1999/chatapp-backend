@@ -55,6 +55,9 @@ async function validateNewUser(req, res, next) {
     }
 }
 
+
+
+
 //Get The OTP from redis and validate it
 //If Opt matches then get User data stored in redis 
 //and store it in Mongodb 
