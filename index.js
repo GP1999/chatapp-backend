@@ -7,7 +7,12 @@ const mongodb=require('./Databases/MongoDb.js');
 const radisClient=require('./Databases/radis.js');
 const compression=require('compression');
 const routes=require('./Services/index.js');
-
+const server=http.createServer(app);
+const io=require('socket.io')(server,{
+    cors:{
+        origin:'*'
+    }
+});
 //Applying middlewares 
 app.use(cors());
 app.use(express.json());
@@ -20,13 +25,21 @@ app.use('/api/v1/',routes);
 
 
 
+//apply socket handlers and define different event handlres
+io.on('connection',(socket)=>{
+    console.log(`user with socket id ${socket.id} is connected`);
+})
+io.on('disconnect',(socket)=>{
+
+    console.log(`User with socketid ${socket.id} is disconnected`);
+})
 
 
 
 //start server and perform cleaning and closing of other connection 
 //on closing server
 const PORT=process.env.PORT |8080;
-const server=http.createServer(app);
+
 server.listen(PORT,()=>{
     console.log(`server listning on Port ${PORT}`)
 });

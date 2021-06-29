@@ -5,6 +5,7 @@ const short = require('short-uuid');
 const User = require('../../Modals/User.js')
 const {sendOTP} = require('../../Helpers/helpers.js');
 const DB = mongodb.db("ChatApp");
+const jwt = require('jsonwebtoken');
 
 // API function which will be called during first user creation
 // It will store information of users in redis before validating otp
@@ -12,8 +13,8 @@ const DB = mongodb.db("ChatApp");
 async function validateNewUser(req, res, next) {
     try {
         let {email, name, password} = req.body;
-        console.log(email,name,password)
-        let newUser =new User(email, name, password);
+        console.log(email, name, password)
+        let newUser = new User(email, name, password);
         // Validating User Data
         let validationResult = newUser.isValid();
         if (validationResult.isValid === false) {
@@ -30,8 +31,9 @@ async function validateNewUser(req, res, next) {
                 if (result == null) {
 
                     const userId = short.generate();
+                    console.log(newUser.getObject());
                     let radisvalue = JSON.stringify(newUser.getObject());
-                    let key='user-'+userId
+                    let key = 'user-' + userId
 
                     radisClient.SET(key, radisvalue, function (err, reply) {
                         if (err) {
@@ -56,11 +58,9 @@ async function validateNewUser(req, res, next) {
 }
 
 
-
-
-//Get The OTP from redis and validate it
-//If Opt matches then get User data stored in redis 
-//and store it in Mongodb 
+// Get The OTP from redis and validate it
+// If Opt matches then get User data stored in redis
+// and store it in Mongodb
 async function validateOTP(req, res, next) {
 
     try {
@@ -77,30 +77,35 @@ async function validateOTP(req, res, next) {
             } else {
 
                 console.log(`actual OTP is ${result} and user entered otp is ${OTP}`);
-                if (OTP === result) {
-                    //Get User data stored in redis to transfer it to permanent MongoDb storage
+                if (OTP === result) { // Get User data stored in redis to transfer it to permanent MongoDb storage
                     let key = 'user-' + userid;
                     radisClient.get(key, (err, reply) => {
                         if (err) {
                             console.log(err);
                             res.status(500).send({err: "Internal server Error"});
-                        } else {
+                        } else if (reply) {
 
                             let data = JSON.parse(reply);
                             console.log(data);
-                            let NewUser =new  User(data.email, data.name, data.password);
+                            let NewUser = new User(data.email, data.name, data.password);
                             NewUser.saveInMongo().then((result, err) => {
                                 if (err) {
                                     console.log(err);
                                     res.status(500).send({err: "Internal server error"});
                                 } else {
-
-                                    res.status(200).send({err: null});
+                                   //Send jwt token for session management
+                                   //Token contains userid which will uniquely identify user in future
+                                    const token = jwt.sign({
+                                        userId: result.ops[0].id
+                                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1h'});
+                                    res.status(200).send({err: null, token: token});
                                     console.log("Success Fully User created");
-                                    //Delete Now User Data which is stored in redis
+                                    // Delete Now User Data which is stored in redis
                                     radisClient.del(key);
                                 }
-                            });   
+                            });
+                        } else {
+                            res.status(400).send({err: "INvalid operation"})
                         }
                     });
 

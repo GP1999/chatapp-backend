@@ -6,8 +6,8 @@ class User {
     constructor(email, name, password) {
         this.email = email.trim();
         this.name = name.trim();
-        this.password = pbkdf2Sync(password, 'salt', 1000, 64, 'sha512').toString('hex');
-
+        this.password=password
+       // this.password = pbkdf2Sync(password, 'salt', 1000, 64, 'sha512').toString('hex');
     }
     //TO validate User Info
     isValid() {
@@ -37,6 +37,8 @@ class User {
     //It will return Promise
 
     saveInMongo() {
+        this.password = pbkdf2Sync(this.password, 'salt', 1000, 64, 'sha512').toString('hex');
+    
         return  ChatApp.collection('Users').insertOne(this.getObject());
     }
 }
