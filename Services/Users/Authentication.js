@@ -56,6 +56,33 @@ async function Login(req, res, next) {
     }
 
 }
+
+
+// Authenticate Logged in users .
+async function Authenticate(req, res, next) {
+    try {
+        const token = req.body.token;
+        if (token) {
+            // verify token.If token is invalid then it will generate error
+            // Invalide token-expired token,not signed token ,etc.
+            jwt.verify(token, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+                if (err) {
+                    res.status(403).send({err: "Invalid token.Please Login"});
+
+                } else {
+                    res.status(200).send({err: null})
+                }
+            })
+
+        } else {
+            res.status(403).send({err: "Invalid token.Please login"})
+        }
+
+    } catch (err) {
+        res.status(400).send({err: "Bad request"})
+    }
+}
 module.exports = {
-    Login
+    Login,
+    Authenticate
 }
