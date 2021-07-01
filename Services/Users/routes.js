@@ -13,6 +13,6 @@ router.post('/validate_otp',validateOTP);
 router.post('/login',Login);
 
 //Authenticate user after login 
-router.post('authenticate',Authenticate);
+router.post('/authenticate',Authenticate);
 
 module.exports=router

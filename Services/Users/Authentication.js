@@ -28,13 +28,13 @@ async function Login(req, res, next) {
                     if (Pass === result.password) {
                         const token = jwt.sign({
                             userId: result._id
-                        }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1h'});
+                        }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
                         // console.log(result._id);
                         const data = {
                             token: token,
                             name: result.name,
                             email: result.email,
-                            userid: result._id,
+                            userId: result._id,
                             err: null
                         }
                         res.status(200).send(data);

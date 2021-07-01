@@ -40,10 +40,30 @@ async function validateNewUser(req, res, next) {
                             res.status(500).send({err: "Something is wrong"})
 
                             console.log(err);
-                        } else { // sending OTP
-                            sendOTP(userId, email);
-                            res.status(200).send({userId: userId, err: null})
-                            console.log(reply);
+                        } else { 
+                            // Commenting out only for development and testing purpose
+                            // sending OTP
+                           // sendOTP(userId, email);
+                           // res.status(200).send({userId: userId, err: null})
+                            //console.log(reply);
+                            //Comment below part on production .This is only for testing user creation
+                            //quickly
+                            newUser.saveInMongo().then((result, err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res.status(500).send({err: "Internal server error"});
+                                } else {
+                                   //Send jwt token for session management
+                                   //Token contains userid which will uniquely identify user in future
+                                    const token = jwt.sign({
+                                        userId: result.ops[0].id
+                                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
+                                    res.status(200).send({err: null, userId:result.ops[0].id,token: token});
+                                    console.log("Success Fully User created");
+                                    // Delete Now User Data which is stored in redis
+                                    //radisClient.del(key);
+                                }
+                            });
                         }
                     });
                 } else {
@@ -97,8 +117,8 @@ async function validateOTP(req, res, next) {
                                    //Token contains userid which will uniquely identify user in future
                                     const token = jwt.sign({
                                         userId: result.ops[0].id
-                                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1h'});
-                                    res.status(200).send({err: null, token: token});
+                                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
+                                    res.status(200).send({err: null,userId: result.ops[0].id, token: token});
                                     console.log("Success Fully User created");
                                     // Delete Now User Data which is stored in redis
                                     radisClient.del(key);
