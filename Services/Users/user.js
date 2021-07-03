@@ -6,7 +6,7 @@ const User = require('../../Modals/User.js')
 const {sendOTP} = require('../../Helpers/helpers.js');
 const DB = mongodb.db("ChatApp");
 const jwt = require('jsonwebtoken');
-
+const UserFriends =require('../../Modals/UserFriends.js');
 // API function which will be called during first user creation
 // It will store information of users in redis before validating otp
 // After validating otp we will store data in Db
@@ -60,6 +60,9 @@ async function validateNewUser(req, res, next) {
                                     }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
                                     res.status(200).send({err: null, userId:result.ops[0].id,token: token});
                                     console.log("Success Fully User created");
+                                    const UserFriend=new UserFriends(result.ops[0].id);
+                                    UserFriend.createDocumetForUser();
+
                                     // Delete Now User Data which is stored in redis
                                     //radisClient.del(key);
                                 }
@@ -120,6 +123,10 @@ async function validateOTP(req, res, next) {
                                     }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
                                     res.status(200).send({err: null,userId: result.ops[0].id, token: token});
                                     console.log("Success Fully User created");
+                                    //Create Users Friend List
+                                    const UserFriend=new UserFriends(result.ops[0].id);
+                                    UserFriend.createDocumetForUser();
+
                                     // Delete Now User Data which is stored in redis
                                     radisClient.del(key);
                                 }
