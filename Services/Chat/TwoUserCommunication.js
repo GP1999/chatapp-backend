@@ -13,13 +13,13 @@ function TwoUserChat(io, socket) {
         radishClient.get(receiverKey, (err, receiverSocketId) => {
 
             if (err) {
-                
-                  socket.to(socket.id).emit('invalid_recepient','No receiver Present');
+
+                socket.to(socket.id).emit('invalid_recepient', 'No receiver Present');
                 console.log(err);
-            }else if(receiverSocketId){
-                socket.to(receiverSocketId).emit('new_message',msg);
-            }else{
-                socket.to(socket.id).emit('invalid_recepient','No receiver Present');
+            } else if (receiverSocketId) {
+                socket.to(receiverSocketId).emit('new_message', msg);
+            } else {
+                socket.to(socket.id).emit('invalid_recepient', 'No receiver Present');
 
 
             }

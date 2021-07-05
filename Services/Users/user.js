@@ -56,11 +56,11 @@ async function validateNewUser(req, res, next) {
                                    //Send jwt token for session management
                                    //Token contains userid which will uniquely identify user in future
                                     const token = jwt.sign({
-                                        userId: result.ops[0].id
+                                        userId: result.ops[0]._id
                                     }, process.env.JWT_PRIVATE_KEY, {expiresIn: '20h'});
-                                    res.status(200).send({err: null, userId:result.ops[0].id,token: token});
-                                    console.log("Success Fully User created");
-                                    const UserFriend=new UserFriends(result.ops[0].id);
+                                    res.status(200).send({err: null, userId:result.ops[0]._id,token: token});
+                                    console.log("Success Fully User created" ,result.ops[0]._id);
+                                    const UserFriend=new UserFriends(result.ops[0]._id);
                                     UserFriend.createDocumetForUser();
 
                                     // Delete Now User Data which is stored in redis

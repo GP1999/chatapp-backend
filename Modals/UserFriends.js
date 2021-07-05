@@ -35,11 +35,13 @@ class UserFriends {
     }
     //It will fetch the details of Friends of User
     getUsersFriendsDetails(ids){    
-        return ChatApp.collection('UserFriends').find({_id:{$in:ids}},{password:0}).toArray();
+        console.log(typeof(ids[0]))
+      
+        return ChatApp.collection('Users').find({'_id':{'$in':ids}},{projection:{password:0}}).toArray();
     }
     addFriend(friendId){
 
-        return ChatApp.collection('UserFriends').updateOne({_id:ObjectID(this.id)},{$push:{friends:friendId}});
+        return ChatApp.collection('UserFriends').updateOne({_id:ObjectID(this.id)},{$push:{friends:ObjectID(friendId)}});
     }
 }
 

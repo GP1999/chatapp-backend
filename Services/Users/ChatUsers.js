@@ -11,16 +11,17 @@ function getUsersFriendsList(req, res, next) {
             if (err) {
                 console.log(err);
                 res.status(500).send({err: "Internal Server Error"})
-            } else {
+            } else { // console.log(result);
+                UserFriend.getUsersFriendsDetails(result.friends).then((result) => { // console.log(result);
+                    res.status(200).send(result);
+                })
 
-                console.log(result);
-                res.status(200).send(JSON.stringify(result));
             }
 
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log(err)
             res.status(500).send({err: "Internal Server Error"})
-        
+
         });
 
 
@@ -31,21 +32,21 @@ function getUsersFriendsList(req, res, next) {
 
 }
 
-//function addInFriendList(userId,friendId){
-function addInFriendList(req,res,next){
-    const {userId,friendId}=req.body;
-    const UserFriend=new UserFriends(userId);
-    UserFriend.addFriend(friendId).then((result)=>{
+// function addInFriendList(userId,friendId){
+function addInFriendList(req, res, next) {
+    const {userId, friendId} = req.body;
+    const UserFriend = new UserFriends(userId);
+    UserFriend.addFriend(friendId).then((result) => {
         console.log(result);
         res.status(200).send();
-    }).catch((err)=>{
+    }).catch((err) => {
         console.log(err);
         res.status(500).send();
     })
 }
 
 
-module.exports={
+module.exports = {
     getUsersFriendsList,
     addInFriendList
 }
